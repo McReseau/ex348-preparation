@@ -1,0 +1,20 @@
+---
+- name: configuration of the nfs client
+  hosts: client
+  tasks:
+  - name: installation of some tools
+    yum:
+      name: nfs-utils
+      state: latest
+  - name: creation of mount point
+    file:
+      path: /nfs-client
+      state: directory
+      owner: ansible
+      group: ansible
+  - name: mounting of the share
+    mount:
+      src: 192.168.10.20:/nfs-server
+      fstype: nfs
+      path: /nfs-client
+      state: mounted

@@ -1,0 +1,44 @@
+---
+- name: installation and configuration of servers
+  hosts: server
+  tasks:
+  - name: installation of some packages
+    yum:
+      name: nfs-utils
+      state: latest
+  - name: activation du service
+    service:
+      name: nfs-server
+      state: restarted
+      enabled: yes
+  - name: ouverture du pare-feu
+    firewalld:
+      service: "{{ item }}"
+      immediate: yes
+      permanent: yes
+      state: enabled
+    loop:
+      - rpc-bind
+      - mountd
+      - nfs
+  - name: create du répertoire pour le partage
+    file:
+      path: /nfs-server
+      state: directory
+      owner: ansible
+      group: ansible
+  - name: Ajout du partage dans le fichier de configuration
+    copy:
+      dest: /etc/exports
+      content: |
+         /nfs-server 192.168.10.0/24(rw,no_root_squash)
+  - name: Application de la configuration
+    command: 
+      cmd: exportfs -r
+  - name: vérification du partage
+    command: 
+      cmd: showmount -e {{ansible_hostname}}
+    register: resultats
+  - name: Affichage du résultat
+    debug:
+      var: resultats
