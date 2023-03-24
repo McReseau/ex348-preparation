@@ -1,0 +1,41 @@
+---
+- name: configure iscsi server
+  hosts: client
+  tasks:
+  - name: install required packages
+    yum:
+      name: 
+      - targetcli
+      - iscsi-initiator-utils
+      state: latest
+  - name: configure the Internal name
+    copy:
+      dest: /etc/iscsi/initiatorname.iscsi
+      content: | 
+           InitiatorName=iqn.2023-03.cm.viannijeu:node2
+  - name: restart service
+    service:
+      name: iscsid
+      state: restarted
+      enabled: yes
+  - name: create the mount directory
+    file:
+      path: /remote
+      state: directory
+  - name: mount the iscsi storage
+    command:
+      cmd: iscsiadm --mode discovery --type st --portal 192.168.10.20:3260 -l
+  - name: format the new drive
+    filesystem:
+      dev: /dev/sdd
+      fstype: xfs
+  - name: mount the disk
+    mount:
+      src: /dev/sdd
+      path: /remote
+      fstype: xfs
+      state: mounted
+  - name: create a file
+    copy:
+      dest: /remote/test.txt
+      content: "Je crois que c\'est fait"
