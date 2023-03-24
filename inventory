@@ -1,0 +1,4 @@
+[client]
+node3 ansible_host=192.168.10.30
+[server]
+node2 ansible_host=192.168.10.20
