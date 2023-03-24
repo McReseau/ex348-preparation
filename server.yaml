@@ -1,0 +1,69 @@
+---
+- name: configuration of server
+  hosts: server
+  vars_files: 
+  - password-samba.yaml
+  tasks:
+  - name: installation of different packages
+    yum:
+      name: 
+        - samba
+        - cifs-utils
+        - policycoreutils-python-utils
+      state: latest
+  - name: opening of the firewall
+    firewalld:
+      service: samba
+      state: enabled
+      immediate: yes
+      permanent: yes
+  - name: group creation
+    group:
+      name: external
+      state: present
+  - name: creation of directory
+    file:
+      path: /partage/storage
+      state: directory
+      recurse: True
+      owner: ansible
+      mode: "2775"
+      group: external
+  - name: context changing
+    sefcontext:
+      target: '/partage/storage(/.*)?'
+      setype: samba_share_t
+      state: present
+  - name: application du context
+    command: restorecon -Rv /partage/storage
+  - name: creation of simple users
+    user:
+      name: delmas
+      system: yes
+      shell: /bin/nologin
+      group: external
+      append: True
+  - name: creation of samba users
+    command: smbpasswd -s -a delmas
+    args:
+      stdin: "{{ password }}\n{{ password }}"
+  - name: generation of configuration file
+    blockinfile:
+      path: /etc/samba/smb.conf
+      block: |
+        [storage]
+                comment = storage sharing
+                path = /partage/storage
+                valid users = @external delmas
+                write list = delmas
+                writable = Yes
+#  - name: changing security type
+#    lineinfile:
+#      path: /etc/samba/smb.conf
+#      line: security = domain 
+#      regex: 'security = user''
+  - name: activation du service
+    service:
+      name: smb
+      state: restarted
+      enabled: yes

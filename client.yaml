@@ -1,0 +1,33 @@
+---
+- name: configuring client to use the samba share
+  hosts: server
+  vars_files: password-samba.yaml
+  tasks:
+  - name: installation of some packages
+    yum:
+      name: 
+        - cifs-utils
+        - samba-client
+      state: present
+  - name: creation of mounting directory
+    file:
+      path: /partage/data1
+      state: directory
+      owner: ansible
+      group: ansible
+      mode: "2775"
+      recurse: yes
+  - name: creation of password file
+    copy:
+      dest: /tmp/credentials.txt
+      content: |
+        username=delmas
+        password={{ password }}
+        domain=samba
+  - name: mounting of the shared directory
+    mount:
+      src: //192.168.10.20/storage
+      path: /storage/data1
+      fstype: cifs
+      state: mounted
+      opts: credentials=/tmp/credentials.txt,multiuser
