@@ -1,0 +1,64 @@
+---
+- name: configuration of team for both network on node2
+  hosts: client1
+  vars:
+    network_connections:
+    - name: teama
+      type: team
+      interface_name: teama
+      state: up
+      ip:
+        dhcp4: no
+        gateway4: 192.168.1.1
+        dns:
+          - 8.8.8.8
+          - 192.168.1.1
+        dns_search:
+          - viannijeu.cm
+        address:
+          - 192.168.1.20/24
+    
+    - name: teamb
+      type: team
+      interface_name: teamb
+      state: up
+      ip:
+        dhcp4: no
+        gateway4: 192.168.2.1
+        dns:
+          - 8.8.8.8
+          - 192.168.2.1
+        dns_search:
+          - viannijeu.cm
+        address:
+          - 192.168.2.20/24
+
+    - name: teama-ens161
+      type: ethernet
+      interface_name: ens161
+      master: teama
+      state: up
+    - name: teama-ens193
+      type: ethernet
+      interface_name: ens193
+      master: teama
+      state: up
+    - name: teamb-ens224
+      type: ethernet
+      interface_name: ens224
+      master: teamb
+      state: up
+    - name: teamb-ens256
+      type: ethernet
+      interface_name: ens256
+      master: teamb
+      state: up
+  roles: 
+  - linux-system-roles.network
+  tasks:
+  - name: configuration of the right protocol for team
+    shell: "nmcli connection modify teama team.runner activebackup && nmcli connection modify teamb team.runner activebackup"
+  - name: restart teams interfaces 
+    shell: "nmcli connection down teama && nmcli connection up teama && nmcli connection down teamb && nmcli connection up teamb"
+  - name: affichage des ips des interfaces
+    command: "ip a s"

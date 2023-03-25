@@ -1,0 +1,19 @@
+---
+- name: configuration of ens161 network card
+  hosts: node2
+  vars:
+    network_connections:
+    - name: ens161
+      type: ethernet
+      ip:
+        dhcp4: no
+        gateway4: 192.168.1.1
+        dns:
+          - 8.8.8.8
+          - 192.168.1.1
+        dns_search:
+          - viannijeu.cm
+        address:
+          - 192.168.1.21/24
+  roles:
+  - linux-system-roles.network
