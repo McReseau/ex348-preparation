@@ -1,0 +1,31 @@
+---
+- name: installation and configuration of an DNS server
+  hosts: server
+  tasks:
+  - name: installation of packages
+    yum:
+      name: bind
+      state: latest
+  - name: ouverture du parefeu
+    firewalld:
+      service: dns
+      immediate: yes
+      permanent: yes
+      state: enabled
+  - name: generation du fichier de configuration
+    template:
+      src: named.conf.j2
+      dest: /etc/named.conf
+  - name: generation du fichier de la zone de recherche directe
+    template:
+      src: viannijeu.cm.zone.j2
+      dest: /etc/viannijeu.cm.zone
+  - name: generation du fichier de la zone de recherche inversé
+    template:
+      src: 10.168.192.zone.j2
+      dest: /etc/10.168.192.zone
+  - name: activation du service
+    service:
+      name: named
+      state: restarted
+      enabled: true
