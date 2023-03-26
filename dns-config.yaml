@@ -19,11 +19,11 @@
   - name: generation du fichier de la zone de recherche directe
     template:
       src: viannijeu.cm.zone.j2
-      dest: /etc/viannijeu.cm.zone
+      dest: /var/named/viannijeu.cm.zone
   - name: generation du fichier de la zone de recherche inversé
     template:
       src: 10.168.192.zone.j2
-      dest: /etc/10.168.192.zone
+      dest: /var/named/10.168.192.zone
   - name: activation du service
     service:
       name: named
