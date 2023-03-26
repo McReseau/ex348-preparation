@@ -1,0 +1,23 @@
+---
+- name: installation and configuration of dhcp server
+  hosts: server1
+  tasks:
+  - name: installation of differents packages
+    yum:
+      name: dhcp-server
+      state: latest
+  - name: creation of configuration file from template
+    template:
+      src: dhcpd.conf.j2
+      dest: /etc/dhcp/dhcpd.conf
+  - name: activation and restarting of dhcp server
+    service:
+      name: dhcpd
+      state: restarted
+      enabled: yes
+  - name: firewall opening
+    firewalld:
+      service: dhcp
+      immediate: yes
+      permanent: yes
+      state: enabled
