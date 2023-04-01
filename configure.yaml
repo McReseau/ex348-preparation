@@ -13,21 +13,21 @@
       permanent: yes
       state: enabled
   - name: configuration of myorigin
-    command: 'postconfig -e "myorigin = node2.viannijeu.cm"'
+    command: 'postconf -e "myorigin = node2.viannijeu.cm"'
   - name: configuration of realy server
-    command: 'postconfig -e "relayhost  = node3.viannijeu.cm"' 
+    command: 'postconf -e "relayhost  = node3.viannijeu.cm"' 
   - name: configuration of destination message
-    command: 'postconfig -e "local_transport = error: No local delivery"'
+    command: 'postconf -e "local_transport = error: No local delivery"'
   - name: configuration of destination
-    command: 'postconfig -e "destination = "'
+    command: 'postconf -e "destination = "'
   - name: configuration of  domain
-    command: 'postconfig -e "mydomain = viannijeu.cm"'
+    command: 'postconf -e "mydomain = viannijeu.cm"'
   - name: configuration of networks
-    command: 'postconfig -e "mynetworks = 127.0.0.1/8"'
+    command: 'postconf -e "mynetworks = 127.0.0.1/8"'
   - name: configuration of interfaces
-    command: 'postconfig -e "inet_interfaces = localhost-only"'
+    command: 'postconf -e "inet_interfaces = localhost"'
   - name: configuration of protocols
-    command: 'postconfig -e "inet_protocols = ipv4"'
+    command: 'postconf -e "inet_protocols = ipv4"'
   - name: activation of service
     service:
       name: postfix
