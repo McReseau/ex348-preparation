@@ -1,0 +1,44 @@
+---
+- name: Installation and configuration of printers
+  hosts: node2
+  tasks:
+  - name: installation of some packages
+    yum:
+      name: cups
+      state: latest
+  - name: activation of service
+    service:
+      name: cups
+      state: restarted
+      enabled: yes
+  - name: opening ports on firewalld 1
+    firewalld:
+      service: mdns
+      state: enabled
+      immediate: yes
+      permanent: yes
+  - name: opening ports on firewalld 2
+    firewalld:
+      port: '631/tcp'
+      immediate: yes
+      permanent: yes
+      state: enabled
+  - name: adding a printer
+    command:
+      cmd: "lpadmin -v ipp://localhost:631/ipp/printers -m everywhere -p queue-prod-1  -E "
+    ignore_errors: yes
+  - name: setting default printer
+    command:
+      cmd: "lpadmin -d queue-prod-1"
+    ignore_errors: yes
+  - name: adding some files
+    copy:
+      dest: /home/ansible/imprimer.txt
+      content: "Je vais imprimer quelque chose todays"
+      owner: ansible
+      group: ansible
+  - name: impression page test
+    command: 
+      cmd: "lp /home/ansible/imprimer.txt"
+    ignore_errors: yes
+  

@@ -1,0 +1,8 @@
+---
+- name: enabling printer
+  hosts: node2
+  tasks:
+  - name: enabling printer
+    command:
+      cmd: "cupsdisable queue-prod-1"
+    ignore_errors: yes

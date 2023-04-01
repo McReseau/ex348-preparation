@@ -1,0 +1,8 @@
+---
+- name: printing some documents
+  hosts: node2
+  ignore_errors: yes
+  tasks:
+  - name: disabling queue
+    command:
+      cmd: "cupsenable queue-prod-1"
