@@ -1,0 +1,35 @@
+---
+- name: installation and configuration of a relay email server
+  hosts: email
+  tasks:
+  - name: installation of some packages
+    yum:
+      name: postfix
+      state: latest
+  - name: opening firewall service
+    firewalld:
+      service: smtp
+      immediate: yes
+      permanent: yes
+      state: enabled
+  - name: configuration of myorigin
+    command: 'postconfig -e "myorigin = node2.viannijeu.cm"'
+  - name: configuration of realy server
+    command: 'postconfig -e "relayhost  = node3.viannijeu.cm"' 
+  - name: configuration of destination message
+    command: 'postconfig -e "local_transport = error: No local delivery"'
+  - name: configuration of destination
+    command: 'postconfig -e "destination = "'
+  - name: configuration of  domain
+    command: 'postconfig -e "mydomain = viannijeu.cm"'
+  - name: configuration of networks
+    command: 'postconfig -e "mynetworks = 127.0.0.1/8"'
+  - name: configuration of interfaces
+    command: 'postconfig -e "inet_interfaces = localhost-only"'
+  - name: configuration of protocols
+    command: 'postconfig -e "inet_protocols = ipv4"'
+  - name: activation of service
+    service:
+      name: postfix
+      state: restarted
+      enabled: yes
