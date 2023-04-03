@@ -1,6 +1,6 @@
 ---
 - name: installation and configuration of database
-  hosts: node2
+  hosts: node3
   tasks:
   - name: installation of database module
     yum:
@@ -23,7 +23,7 @@
       permanent: true
   - name: installation of PyMySQL
     yum:
-      name: python3-pymysql
+      name: python3-PyMySQL
       state: present
   - name: set root password for mariadb
     mysql_user:
@@ -34,40 +34,39 @@
       update_password: always
     no_log: true
     ignore_errors: true
-   - name: copy the login file
-     template:
-       src: my.cnf
-       dest: /root/.my.cnf
-   - name: deleting anonymous users
-     mysql_user:
-       name: ''
-       state: absent
-       host_all: yes
-   - name: adding the personnel database
-     mysql_db:
-       name: personnel
-       state: present
-       config_file: /root/.my.cnf
-   - name: Copy insert.sql file
-     copy: 
-       src: insert.sql
-       dest: /tmp/insert.sql
-   - name: importation of the insert.sql into the database personnel
-     mysql_db:
-       name: personnel
-       state: import
-       target: /tmp/insert.sql
-       config_file: /root/.my.cnf
-   - name: Adding a user vianney
-     mysql_user:
-       name: vianney
-       password: Tenne1996
-       update_password: always
-       host_all: yes
-       state: present
-   - name: giving some privileges to the newly created user
-     mysql_user:
-       name: vianney
-       state: present
-       priv: 'vianney.*:INSERT,UPDATE,SELECT,DROP,CREATE'
-       host: localhost
+  - name: copy the login file
+    template:
+      src: my.cnf
+      dest: /root/.my.cnf
+  - name: deleting anonymous users
+    mysql_user:
+      name: ''
+      state: absent
+      host_all: yes
+  - name: adding the personnel database
+    mysql_db:
+      name: personnel
+      state: present
+      config_file: /root/.my.cnf
+  - name: Copy insert.sql file
+    copy: 
+      src: insert.sql
+      dest: /tmp/insert.sql
+  - name: importation of the insert.sql into the database personnel
+    mysql_db:
+      name: personnel
+      state: import
+      target: /tmp/insert.sql
+      config_file: /root/.my.cnf
+  - name: Adding a user vianney
+    mysql_user:
+      name: vianney
+      password: Tenne1996
+      update_password: always
+      state: present
+  - name: giving some privileges to the newly created user
+    mysql_user:
+      name: vianney
+      state: present
+      priv: 'vianney.*:INSERT,UPDATE,SELECT,DROP,CREATE'
+      host: localhost
