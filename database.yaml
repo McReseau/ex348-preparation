@@ -1,0 +1,40 @@
+---
+- name: installation and configuration of database
+  hosts: node2
+  tasks:
+  - name: installation of database module
+    yum:
+      name: '@mariadb:10.3/server'
+      state: present
+  - name: installation of mysql client
+    yum:
+      name: mariadb
+      state: present
+  - name: enable and start mariadb
+    service:
+      name: mariadb
+      state: restarted
+      enabled: true
+  - name: opening firewall
+    firewalld:
+      service: mysql
+      immediate: true
+      state: enabled
+      permanent: true
+  - name: installation of PyMySQL
+    yum:
+      name: python3-pymysql
+      state: present
+  - name: set root password for mariadb
+    mysql_user:
+      name: root
+      state: present
+      password: redhat
+      host_all: true
+      update_password: always
+    no_log: true
+    ignore_errors: true
+   - name: copy the login file
+     template:
+       src: my.cnf
+       dest: /root/.my.cnf
