@@ -38,3 +38,14 @@
      template:
        src: my.cnf
        dest: /root/.my.cnf
+   - name: deleting anonymous users
+     mysql_user:
+       name: ''
+       state: absent
+       host_all: yes
+   - name: adding the personnel database
+     mysql_db:
+       name: personnel
+       state: present
+       config_file: /root/.my.cnf
+   - name: 
