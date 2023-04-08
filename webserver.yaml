@@ -115,3 +115,12 @@
       name: haproxy
       state: restarted
       enabled: true
+  - name: opening firewall
+    firewalld:
+      service: "{{item}}"
+      immediate: true
+      permanent: true
+      state: enabled
+    loop: 
+      - https
+      - http
