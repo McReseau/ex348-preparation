@@ -106,3 +106,12 @@
     yum:
       name: haproxy
       state: present
+  - name: generate the configuration file
+    template:
+      src: haproxy.cfg.j2
+      dest: /etc/haproxy/haproxy.cfg
+  - name: restarting haproxy service
+    service:
+      name: haproxy
+      state: restarted
+      enabled: true
