@@ -1,0 +1,27 @@
+---
+- name: installation and configuration of nginx server
+  hosts: node3
+  tasks:
+  - name: installation of differents packages
+    yum:
+      name: nginx
+      state: present
+  -
+
+---
+- name: installation and configuration of httpd server
+  hosts: node2
+  tasks:
+  - name: installation of differents packages
+    yum:
+      name: httpd
+      state: present
+
+---
+- name: installation and configuration of haproxy server
+  hosts: node1
+  tasks:
+  - name: installation of differents packages
+    yum:
+      name: haproxy
+      state: present

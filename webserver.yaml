@@ -1,0 +1,108 @@
+---
+- name: installation and configuration of nginx server
+  hosts: node3
+  tasks:
+  - name: installation of differents packages
+    yum:
+      name: nginx
+      state: present
+  - name: ouverture du firewall
+    firewalld:
+      service: "{{ item }}"
+      state: enabled
+      immediate: true
+      permanent: true
+    loop:
+      - http
+      - https
+  - name: Creating of configuration files
+    copy:
+      content: |
+         server {
+           listen       192.168.10.30:80;
+           server_name  node3.viannijeu.cm;
+           location / {
+              root   /resources/web;
+           }
+ 
+           error_page 404 /404.html;
+              location = /40x.html {
+           }
+
+           error_page 500 502 503 504 /50x.html;
+              location = /50x.html {
+           }
+         }        
+      dest: /etc/nginx/conf.d/webserver.conf
+  - name:  creating of directory
+    file:
+      path: /resources/web
+      state: directory
+      setype: httpd_sys_content_t
+  - name: Creating of content
+    copy:
+      content: |
+          <h1> Welcome to the nginx webserver from node3.viannijeu.Cm </h1>
+      dest: /resources/web/index.html
+  - name: changing context
+    command: "chcon -t httpd_sys_content_t -R /resources/web"
+  - name: restarting web server
+    service:
+      name: nginx
+      state: restarted
+      enabled: true
+#---
+- name: installation and configuration of httpd server
+  hosts: node2
+  tasks:
+  - name: installation of differents packages
+    yum:
+      name: httpd
+      state: present
+  - name: ouverture du pare-feu
+    firewalld:
+      service: "{{ item }}"
+      state: enabled
+      immediate: true
+      permanent: true
+    loop:
+      - http
+      - https
+  - name: creating of configuration files
+    copy:
+      content: |
+           <Directory "/resources/web">
+              AllowOverride None
+              Require all granted
+           </Directory>
+
+           <VirtualHost 192.168.10.20:80>
+              DocumentRoot "/resources/web"
+              ServerName node2.viannijeu.cm
+           </VirtualHost>
+      dest: /etc/httpd/conf.d/web.conf
+  - name: creating of directory
+    file:
+      path: /resources/web
+      state: directory
+      setype: httpd_sys_content_t
+  - name: creating content of web server
+    copy: 
+      content: |
+        <h1>Welcome to our httpd webserver from node2.viannijeu.cm </h1>
+      dest: /resources/web/index.html
+  - name: change context
+    command: "chcon -t httpd_sys_content_t -R /resources/web"
+  - name: restarting webserver
+    service:
+      name: httpd
+      state: restarted
+      enabled: yes
+#---
+- name: installation and configuration of haproxy server
+  hosts: node1
+  tasks:
+  - name: installation of differents packages
+    yum:
+      name: haproxy
+      state: present
